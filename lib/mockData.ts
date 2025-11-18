@@ -1,0 +1,231 @@
+// Mock data for development when database is not available
+
+export const mockRooms = [
+  {
+    id: '1',
+    name: 'Cozy Studio Apartment',
+    description: 'A comfortable studio apartment perfect for singles or couples',
+    address: '123 Main St, Apt 4B, New York, NY 10001',
+    rent: 1500,
+    deposit: 1500,
+    size: 450,
+    bedrooms: 1,
+    bathrooms: 1,
+    status: 'AVAILABLE',
+    amenities: ['WiFi', 'Air Conditioning', 'Heating', 'Kitchen'],
+    images: ['/images/room1.jpg'],
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-01-15'),
+    tenants: []
+  },
+  {
+    id: '2',
+    name: 'Spacious 2BR with City View',
+    description: 'Modern 2-bedroom apartment with stunning city views',
+    address: '456 Park Ave, Unit 12C, New York, NY 10022',
+    rent: 2800,
+    deposit: 2800,
+    size: 900,
+    bedrooms: 2,
+    bathrooms: 2,
+    status: 'OCCUPIED',
+    amenities: ['WiFi', 'Air Conditioning', 'Heating', 'Kitchen', 'Balcony', 'Parking'],
+    images: ['/images/room2.jpg'],
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-01-10'),
+    tenants: [
+      {
+        id: 't1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@example.com',
+        phone: '555-0123',
+        roomId: '2',
+        moveInDate: new Date('2024-02-01'),
+        moveOutDate: null,
+        rent: 2800,
+        deposit: 2800,
+        status: 'ACTIVE',
+        createdAt: new Date('2024-01-25'),
+        updatedAt: new Date('2024-01-25'),
+        payments: []
+      }
+    ]
+  },
+  {
+    id: '3',
+    name: 'Luxury Penthouse Suite',
+    description: 'Upscale penthouse with premium amenities and panoramic views',
+    address: '789 Fifth Ave, Penthouse, New York, NY 10065',
+    rent: 5500,
+    deposit: 5500,
+    size: 1800,
+    bedrooms: 3,
+    bathrooms: 3,
+    status: 'AVAILABLE',
+    amenities: ['WiFi', 'Air Conditioning', 'Heating', 'Kitchen', 'Balcony', 'Parking', 'Gym', 'Pool'],
+    images: ['/images/room3.jpg'],
+    createdAt: new Date('2024-01-05'),
+    updatedAt: new Date('2024-01-05'),
+    tenants: []
+  },
+  {
+    id: '4',
+    name: 'Budget-Friendly Room',
+    description: 'Affordable room in shared apartment, utilities included',
+    address: '321 Broadway, Room 3, New York, NY 10007',
+    rent: 900,
+    deposit: 900,
+    size: 200,
+    bedrooms: 1,
+    bathrooms: 1,
+    status: 'MAINTENANCE',
+    amenities: ['WiFi', 'Heating', 'Shared Kitchen'],
+    images: ['/images/room4.jpg'],
+    createdAt: new Date('2024-01-20'),
+    updatedAt: new Date('2024-02-15'),
+    tenants: []
+  },
+  {
+    id: '5',
+    name: 'Downtown Loft',
+    description: 'Industrial-style loft in the heart of downtown',
+    address: '555 Canal St, Loft 8, New York, NY 10013',
+    rent: 3200,
+    deposit: 3200,
+    size: 1200,
+    bedrooms: 2,
+    bathrooms: 2,
+    status: 'RESERVED',
+    amenities: ['WiFi', 'Air Conditioning', 'Heating', 'Kitchen', 'High Ceilings', 'Exposed Brick'],
+    images: ['/images/room5.jpg'],
+    createdAt: new Date('2024-01-12'),
+    updatedAt: new Date('2024-02-10'),
+    tenants: []
+  },
+  {
+    id: '6',
+    name: 'Garden View Apartment',
+    description: 'Peaceful apartment overlooking a beautiful garden',
+    address: '888 Garden Terrace, Apt 2A, New York, NY 10011',
+    rent: 2200,
+    deposit: 2200,
+    size: 750,
+    bedrooms: 1,
+    bathrooms: 1,
+    status: 'OCCUPIED',
+    amenities: ['WiFi', 'Air Conditioning', 'Heating', 'Kitchen', 'Garden Access'],
+    images: ['/images/room6.jpg'],
+    createdAt: new Date('2024-01-08'),
+    updatedAt: new Date('2024-01-08'),
+    tenants: [
+      {
+        id: 't2',
+        firstName: 'Jane',
+        lastName: 'Smith',
+        email: 'jane.smith@example.com',
+        phone: '555-0456',
+        roomId: '6',
+        moveInDate: new Date('2024-01-20'),
+        moveOutDate: null,
+        rent: 2200,
+        deposit: 2200,
+        status: 'ACTIVE',
+        createdAt: new Date('2024-01-15'),
+        updatedAt: new Date('2024-01-15'),
+        payments: []
+      }
+    ]
+  }
+]
+
+export const mockTenants = [
+  {
+    id: 't1',
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@example.com',
+    phone: '555-0123',
+    roomId: '2',
+    room: mockRooms[1],
+    moveInDate: new Date('2024-02-01'),
+    moveOutDate: null,
+    rent: 2800,
+    deposit: 2800,
+    status: 'ACTIVE',
+    createdAt: new Date('2024-01-25'),
+    updatedAt: new Date('2024-01-25'),
+    payments: []
+  },
+  {
+    id: 't2',
+    firstName: 'Jane',
+    lastName: 'Smith',
+    email: 'jane.smith@example.com',
+    phone: '555-0456',
+    roomId: '6',
+    room: mockRooms[5],
+    moveInDate: new Date('2024-01-20'),
+    moveOutDate: null,
+    rent: 2200,
+    deposit: 2200,
+    status: 'ACTIVE',
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-01-15'),
+    payments: []
+  }
+]
+
+export const mockPayments = [
+  {
+    id: 'p1',
+    tenantId: 't1',
+    tenant: mockTenants[0],
+    amount: 2800,
+    date: new Date('2024-02-01'),
+    dueDate: new Date('2024-02-01'),
+    status: 'PAID',
+    method: 'Bank Transfer',
+    notes: 'February rent',
+    createdAt: new Date('2024-02-01'),
+    updatedAt: new Date('2024-02-01')
+  },
+  {
+    id: 'p2',
+    tenantId: 't1',
+    tenant: mockTenants[0],
+    amount: 2800,
+    date: new Date('2024-03-01'),
+    dueDate: new Date('2024-03-01'),
+    status: 'PAID',
+    method: 'Bank Transfer',
+    notes: 'March rent',
+    createdAt: new Date('2024-03-01'),
+    updatedAt: new Date('2024-03-01')
+  },
+  {
+    id: 'p3',
+    tenantId: 't2',
+    tenant: mockTenants[1],
+    amount: 2200,
+    date: new Date('2024-02-01'),
+    dueDate: new Date('2024-02-01'),
+    status: 'PAID',
+    method: 'Credit Card',
+    notes: 'February rent',
+    createdAt: new Date('2024-02-01'),
+    updatedAt: new Date('2024-02-01')
+  },
+  {
+    id: 'p4',
+    tenantId: 't2',
+    tenant: mockTenants[1],
+    amount: 2200,
+    dueDate: new Date('2024-03-01'),
+    status: 'PENDING',
+    method: null,
+    notes: 'March rent',
+    createdAt: new Date('2024-02-15'),
+    updatedAt: new Date('2024-02-15')
+  }
+]
