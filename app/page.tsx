@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RoomCard } from "@/components/rooms/room-card"
 import { RoomDialog } from "@/components/rooms/room-dialog"
-import { Plus, Building2, Users, DollarSign, Home } from "lucide-react"
+import { Plus, Building2, Users, DollarSign, Home as HomeIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 interface Room {
@@ -123,7 +123,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold flex items-center gap-2">
-                <Home className="h-8 w-8 text-primary" />
+                <HomeIcon className="h-8 w-8 text-primary" />
                 Rental Management Platform
               </h1>
               <p className="text-muted-foreground mt-1">
@@ -153,7 +153,7 @@ export default function Home() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Available</CardTitle>
-              <Home className="h-4 w-4 text-muted-foreground" />
+              <HomeIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">{stats.available}</div>
