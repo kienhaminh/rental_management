@@ -3,7 +3,8 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building2, Bed, Bath, DollarSign, Edit, Trash2, FileText } from "lucide-react"
+import { Building2, Bed, Bath, DollarSign, Edit, Trash2, FileText, Eye } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface Room {
   id: string
@@ -35,6 +36,8 @@ const statusColors: Record<string, string> = {
 }
 
 export function RoomCard({ room, onEdit, onDelete, onExportReceipt }: RoomCardProps) {
+  const router = useRouter()
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="pb-4">
@@ -104,6 +107,15 @@ export function RoomCard({ room, onEdit, onDelete, onExportReceipt }: RoomCardPr
       </CardContent>
 
       <CardFooter className="gap-2 pt-4 border-t flex-col">
+        <Button
+          variant="default"
+          size="sm"
+          className="w-full"
+          onClick={() => router.push(`/rooms/${room.id}`)}
+        >
+          <Eye className="h-4 w-4 mr-2" />
+          View Details
+        </Button>
         <div className="flex gap-2 w-full">
           <Button
             variant="outline"
@@ -125,7 +137,7 @@ export function RoomCard({ room, onEdit, onDelete, onExportReceipt }: RoomCardPr
           </Button>
         </div>
         <Button
-          variant="default"
+          variant="outline"
           size="sm"
           className="w-full"
           onClick={() => onExportReceipt(room.id)}
