@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building2, Bed, Bath, DollarSign, Edit, Trash2 } from "lucide-react"
+import { Building2, Bed, Bath, DollarSign, Edit, Trash2, FileText } from "lucide-react"
 
 interface Room {
   id: string
@@ -24,6 +24,7 @@ interface RoomCardProps {
   room: Room
   onEdit: (room: Room) => void
   onDelete: (id: string) => void
+  onExportReceipt: (id: string) => void
 }
 
 const statusColors: Record<string, string> = {
@@ -33,7 +34,7 @@ const statusColors: Record<string, string> = {
   RESERVED: "bg-purple-500",
 }
 
-export function RoomCard({ room, onEdit, onDelete }: RoomCardProps) {
+export function RoomCard({ room, onEdit, onDelete, onExportReceipt }: RoomCardProps) {
   return (
     <Card className="overflow-hidden">
       <CardHeader className="pb-4">
@@ -102,24 +103,35 @@ export function RoomCard({ room, onEdit, onDelete }: RoomCardProps) {
         )}
       </CardContent>
 
-      <CardFooter className="gap-2 pt-4 border-t">
+      <CardFooter className="gap-2 pt-4 border-t flex-col">
+        <div className="flex gap-2 w-full">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={() => onEdit(room)}
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            className="flex-1"
+            onClick={() => onDelete(room.id)}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
+          </Button>
+        </div>
         <Button
-          variant="outline"
+          variant="default"
           size="sm"
-          className="flex-1"
-          onClick={() => onEdit(room)}
+          className="w-full"
+          onClick={() => onExportReceipt(room.id)}
         >
-          <Edit className="h-4 w-4 mr-2" />
-          Edit
-        </Button>
-        <Button
-          variant="destructive"
-          size="sm"
-          className="flex-1"
-          onClick={() => onDelete(room.id)}
-        >
-          <Trash2 className="h-4 w-4 mr-2" />
-          Delete
+          <FileText className="h-4 w-4 mr-2" />
+          Export Receipt
         </Button>
       </CardFooter>
     </Card>
