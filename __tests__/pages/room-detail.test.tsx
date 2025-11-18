@@ -369,8 +369,9 @@ describe('RoomDetailPage', () => {
     fireEvent.click(saveButton);
 
     // Should refetch consumptions after save
+    // Calls: 1-room, 2-consumptions, 3-previous-month, 4-save, 5-consumptions-refetch
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(4);
+      expect(global.fetch).toHaveBeenCalledTimes(5);
     });
   });
 });

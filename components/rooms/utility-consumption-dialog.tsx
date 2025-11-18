@@ -54,10 +54,56 @@ export function UtilityConsumptionDialog({
   });
 
   const [loading, setLoading] = useState(false);
+  const [fetchingPrevious, setFetchingPrevious] = useState(false);
   const [error, setError] = useState('');
+
+  // Fetch previous month's consumption data
+  const fetchPreviousConsumption = async (month: number, year: number) => {
+    setFetchingPrevious(true);
+    try {
+      // Calculate previous month
+      let prevMonth = month - 1;
+      let prevYear = year;
+      if (prevMonth === 0) {
+        prevMonth = 12;
+        prevYear = year - 1;
+      }
+
+      const response = await fetch(`/api/utility-consumption?roomId=${roomId}`);
+      if (response.ok) {
+        const consumptions: UtilityConsumption[] = await response.json();
+
+        // Find consumption for the previous month/year
+        const previousRecord = consumptions.find(
+          c => c.month === prevMonth && c.year === prevYear
+        );
+
+        if (previousRecord) {
+          setFormData(prev => ({
+            ...prev,
+            previousElectricNumber: previousRecord.electricNumber,
+            previousWaterNumber: previousRecord.waterNumber
+          }));
+        } else {
+          // No previous record found, set to 0
+          setFormData(prev => ({
+            ...prev,
+            previousElectricNumber: 0,
+            previousWaterNumber: 0
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching previous consumption:', error);
+      // Keep current values on error
+    } finally {
+      setFetchingPrevious(false);
+    }
+  };
 
   useEffect(() => {
     if (consumption) {
+      // Editing existing record - use stored values
       setFormData({
         month: consumption.month,
         year: consumption.year,
@@ -72,9 +118,12 @@ export function UtilityConsumptionDialog({
     } else {
       // Reset form for new entry
       const currentDate = new Date();
+      const newMonth = currentDate.getMonth() + 1;
+      const newYear = currentDate.getFullYear();
+
       setFormData({
-        month: currentDate.getMonth() + 1,
-        year: currentDate.getFullYear(),
+        month: newMonth,
+        year: newYear,
         electricNumber: 0,
         waterNumber: 0,
         previousElectricNumber: 0,
@@ -83,6 +132,11 @@ export function UtilityConsumptionDialog({
         waterCost: 0,
         notes: ''
       });
+
+      // Fetch previous month's data for new records
+      if (open) {
+        fetchPreviousConsumption(newMonth, newYear);
+      }
     }
     setError('');
   }, [consumption, open]);
@@ -129,10 +183,21 @@ export function UtilityConsumptionDialog({
   };
 
   const handleChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        [field]: value
+      };
+
+      // Fetch previous consumption when month or year changes (only for new records)
+      if (!consumption && (field === 'month' || field === 'year')) {
+        const month = field === 'month' ? value : prev.month;
+        const year = field === 'year' ? value : prev.year;
+        fetchPreviousConsumption(month, year);
+      }
+
+      return updated;
+    });
   };
 
   const electricConsumption = formData.electricNumber - (formData.previousElectricNumber || 0);
@@ -146,7 +211,7 @@ export function UtilityConsumptionDialog({
             {consumption ? 'Edit Utility Consumption' : 'Add Utility Consumption'}
           </DialogTitle>
           <DialogDescription>
-            Track the monthly electric and water meter readings for this room
+            Enter the current meter readings - previous month's readings are loaded automatically
           </DialogDescription>
         </DialogHeader>
 
@@ -161,6 +226,7 @@ export function UtilityConsumptionDialog({
                 onChange={(e) => handleChange('month', parseInt(e.target.value))}
                 className="w-full h-10 px-3 rounded-md border border-input bg-background"
                 required
+                disabled={!!consumption} // Disable month change when editing
               >
                 {MONTHS.map((month, index) => (
                   <option key={index + 1} value={index + 1}>
@@ -179,6 +245,7 @@ export function UtilityConsumptionDialog({
                 min="2000"
                 max="2100"
                 required
+                disabled={!!consumption} // Disable year change when editing
               />
             </div>
           </div>
@@ -186,35 +253,35 @@ export function UtilityConsumptionDialog({
           {/* Electric Numbers */}
           <div className="space-y-4 p-4 border rounded-lg">
             <h4 className="font-semibold">Electric Meter</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="previousElectric">Previous Reading (kWh)</Label>
-                <Input
-                  id="previousElectric"
-                  type="number"
-                  step="0.01"
-                  value={formData.previousElectricNumber}
-                  onChange={(e) => handleChange('previousElectricNumber', parseFloat(e.target.value) || 0)}
-                  placeholder="0"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="currentElectric">Current Reading (kWh) *</Label>
-                <Input
-                  id="currentElectric"
-                  type="number"
-                  step="0.01"
-                  value={formData.electricNumber}
-                  onChange={(e) => handleChange('electricNumber', parseFloat(e.target.value) || 0)}
-                  required
-                />
-              </div>
-            </div>
+
+            {/* Previous Reading (Read-only display) */}
             {formData.previousElectricNumber > 0 && (
-              <p className="text-sm text-gray-600">
+              <div className="bg-gray-50 p-3 rounded-md">
+                <p className="text-sm text-gray-600">
+                  Previous Month's Reading: <span className="font-semibold">{formData.previousElectricNumber.toFixed(2)} kWh</span>
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="currentElectric">Current Reading (kWh) *</Label>
+              <Input
+                id="currentElectric"
+                type="number"
+                step="0.01"
+                value={formData.electricNumber}
+                onChange={(e) => handleChange('electricNumber', parseFloat(e.target.value) || 0)}
+                required
+                disabled={fetchingPrevious}
+              />
+            </div>
+
+            {formData.previousElectricNumber > 0 && formData.electricNumber > 0 && (
+              <p className="text-sm text-blue-600 font-medium">
                 Consumption: <span className="font-semibold">{electricConsumption.toFixed(2)} kWh</span>
               </p>
             )}
+
             <div className="space-y-2">
               <Label htmlFor="electricCost">Electric Cost ($)</Label>
               <Input
@@ -231,35 +298,35 @@ export function UtilityConsumptionDialog({
           {/* Water Numbers */}
           <div className="space-y-4 p-4 border rounded-lg">
             <h4 className="font-semibold">Water Meter</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="previousWater">Previous Reading (m³)</Label>
-                <Input
-                  id="previousWater"
-                  type="number"
-                  step="0.01"
-                  value={formData.previousWaterNumber}
-                  onChange={(e) => handleChange('previousWaterNumber', parseFloat(e.target.value) || 0)}
-                  placeholder="0"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="currentWater">Current Reading (m³) *</Label>
-                <Input
-                  id="currentWater"
-                  type="number"
-                  step="0.01"
-                  value={formData.waterNumber}
-                  onChange={(e) => handleChange('waterNumber', parseFloat(e.target.value) || 0)}
-                  required
-                />
-              </div>
-            </div>
+
+            {/* Previous Reading (Read-only display) */}
             {formData.previousWaterNumber > 0 && (
-              <p className="text-sm text-gray-600">
+              <div className="bg-gray-50 p-3 rounded-md">
+                <p className="text-sm text-gray-600">
+                  Previous Month's Reading: <span className="font-semibold">{formData.previousWaterNumber.toFixed(2)} m³</span>
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="currentWater">Current Reading (m³) *</Label>
+              <Input
+                id="currentWater"
+                type="number"
+                step="0.01"
+                value={formData.waterNumber}
+                onChange={(e) => handleChange('waterNumber', parseFloat(e.target.value) || 0)}
+                required
+                disabled={fetchingPrevious}
+              />
+            </div>
+
+            {formData.previousWaterNumber > 0 && formData.waterNumber > 0 && (
+              <p className="text-sm text-blue-600 font-medium">
                 Consumption: <span className="font-semibold">{waterConsumption.toFixed(2)} m³</span>
               </p>
             )}
+
             <div className="space-y-2">
               <Label htmlFor="waterCost">Water Cost ($)</Label>
               <Input
@@ -289,6 +356,10 @@ export function UtilityConsumptionDialog({
             <p className="text-sm text-red-500">{error}</p>
           )}
 
+          {fetchingPrevious && (
+            <p className="text-sm text-gray-500">Loading previous month's readings...</p>
+          )}
+
           <DialogFooter>
             <Button
               type="button"
@@ -298,7 +369,7 @@ export function UtilityConsumptionDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading || fetchingPrevious}>
               {loading ? 'Saving...' : consumption ? 'Update' : 'Add Record'}
             </Button>
           </DialogFooter>
