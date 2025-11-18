@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RoomCard } from "@/components/rooms/room-card"
 import { RoomDialog } from "@/components/rooms/room-dialog"
+import { ReceiptDialog } from "@/components/rooms/receipt-dialog"
 import { Plus, Building2, Users, DollarSign, Home as HomeIcon, AlertTriangle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -40,6 +41,8 @@ export default function Home() {
   const [filter, setFilter] = useState<string>("ALL")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [roomToDelete, setRoomToDelete] = useState<string | null>(null)
+  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false)
+  const [receiptRoomId, setReceiptRoomId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchRooms()
@@ -92,6 +95,11 @@ export default function Home() {
   const handleDeleteRoom = (id: string) => {
     setRoomToDelete(id)
     setDeleteDialogOpen(true)
+  }
+
+  const handleExportReceipt = (id: string) => {
+    setReceiptRoomId(id)
+    setReceiptDialogOpen(true)
   }
 
   const confirmDelete = async () => {
@@ -269,6 +277,7 @@ export default function Home() {
                 room={room}
                 onEdit={handleEditRoom}
                 onDelete={handleDeleteRoom}
+                onExportReceipt={handleExportReceipt}
               />
             ))}
           </div>
@@ -309,6 +318,12 @@ export default function Home() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ReceiptDialog
+        roomId={receiptRoomId}
+        open={receiptDialogOpen}
+        onOpenChange={setReceiptDialogOpen}
+      />
     </div>
   )
 }

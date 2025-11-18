@@ -221,6 +221,7 @@ export const mockPayments = [
     tenantId: 't2',
     tenant: mockTenants[1],
     amount: 2200,
+    date: new Date('2024-03-01'),
     dueDate: new Date('2024-03-01'),
     status: 'PENDING',
     method: null,
