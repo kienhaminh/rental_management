@@ -1,12 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RoomCard } from "@/components/rooms/room-card"
 import { RoomDialog } from "@/components/rooms/room-dialog"
 import { ReceiptDialog } from "@/components/rooms/receipt-dialog"
-import { Plus, Building2, Users, DollarSign, Home as HomeIcon, AlertTriangle } from "lucide-react"
+import { Plus, Building2, Users, DollarSign, Home as HomeIcon, AlertTriangle, LogOut } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
@@ -16,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { auth } from "@/lib/auth"
 
 interface Room {
   id: string
@@ -34,6 +36,7 @@ interface Room {
 }
 
 export default function Home() {
+  const router = useRouter()
   const [rooms, setRooms] = useState<Room[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -43,8 +46,15 @@ export default function Home() {
   const [roomToDelete, setRoomToDelete] = useState<string | null>(null)
   const [receiptDialogOpen, setReceiptDialogOpen] = useState(false)
   const [receiptRoomId, setReceiptRoomId] = useState<string | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
+    // Check authentication
+    if (!auth.isAuthenticated()) {
+      router.push("/login")
+      return
+    }
+    setIsAuthenticated(true)
     fetchRooms()
   }, [])
 
@@ -121,6 +131,11 @@ export default function Home() {
     setDialogOpen(true)
   }
 
+  const handleLogout = () => {
+    auth.logout()
+    router.push("/login")
+  }
+
   const filteredRooms = filter === "ALL"
     ? rooms
     : rooms.filter(r => r.status === filter)
@@ -134,7 +149,7 @@ export default function Home() {
       .reduce((sum, r) => sum + r.rent, 0),
   }
 
-  if (loading) {
+  if (!isAuthenticated || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg">Loading...</div>
@@ -156,10 +171,16 @@ export default function Home() {
                 Manage your rental properties efficiently
               </p>
             </div>
-            <Button onClick={handleAddNew} size="lg">
-              <Plus className="h-5 w-5 mr-2" />
-              Add Room
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button onClick={handleAddNew} size="lg">
+                <Plus className="h-5 w-5 mr-2" />
+                Add Room
+              </Button>
+              <Button onClick={handleLogout} variant="outline" size="lg">
+                <LogOut className="h-5 w-5 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </div>
