@@ -5,8 +5,16 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RoomCard } from "@/components/rooms/room-card"
 import { RoomDialog } from "@/components/rooms/room-dialog"
-import { Plus, Building2, Users, DollarSign, Home as HomeIcon } from "lucide-react"
+import { Plus, Building2, Users, DollarSign, Home as HomeIcon, AlertTriangle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 interface Room {
   id: string
@@ -30,6 +38,8 @@ export default function Home() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingRoom, setEditingRoom] = useState<Room | null>(null)
   const [filter, setFilter] = useState<string>("ALL")
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [roomToDelete, setRoomToDelete] = useState<string | null>(null)
 
   useEffect(() => {
     fetchRooms()
@@ -79,14 +89,22 @@ export default function Home() {
     setDialogOpen(true)
   }
 
-  const handleDeleteRoom = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this room?')) return
+  const handleDeleteRoom = (id: string) => {
+    setRoomToDelete(id)
+    setDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!roomToDelete) return
 
     try {
-      await fetch(`/api/rooms/${id}`, { method: 'DELETE' })
-      setRooms(rooms.filter(r => r.id !== id))
+      await fetch(`/api/rooms/${roomToDelete}`, { method: 'DELETE' })
+      setRooms(rooms.filter(r => r.id !== roomToDelete))
     } catch (error) {
       console.error('Error deleting room:', error)
+    } finally {
+      setDeleteDialogOpen(false)
+      setRoomToDelete(null)
     }
   }
 
@@ -263,6 +281,34 @@ export default function Home() {
         room={editingRoom}
         onSave={handleSaveRoom}
       />
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Delete Room
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this room? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
